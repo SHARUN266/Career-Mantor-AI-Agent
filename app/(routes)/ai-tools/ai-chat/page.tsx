@@ -2,22 +2,34 @@
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Send } from 'lucide-react'
-import React, { useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import EmptyState from './_components/EmptyState'
 import axios from 'axios'
-
+type messages={
+    content:string,
+    role:string,
+    type:string
+}
 function AiChat() {
     const [userInput, setUserInput] = useState<string>("");
-    const [loading,setLoading]=useState(false)
+    const [loading,setLoading]=useState(false);
+    const [messagesList,setMessagesList]=useState<messages[]>([])
     const onSend=async()=>{
         setLoading(true)
-        
+        setMessagesList(prev=>[...prev,{
+            content:userInput,
+            role:'user',
+            type:'text'
+        }])
         const result=await axios.post('/api/ai-career-chat-agent',{
             userInput:userInput
         });
-        console.log(result?.data)
+        console.log(result?.data);
+        setMessagesList(prev=>[...prev,result?.data])
+        setUserInput("")
         setLoading(false)
-    }
+    };
+    console.log("Get Messages:",messagesList)
   return (
     <div className='px-10 md:px-24 lg:px-36 xl:px-48'>
         <div className='flex items-center justify-between gap-8'>
