@@ -4,9 +4,11 @@ import { db } from "@/configs/db";
 import { usersTable } from "@/configs/schema";
 import { currentUser } from "@clerk/nextjs/server";
 
+
 export async function POST(req: NextRequest) {
     try {
         const user = await currentUser();
+     
 
         if (!user || !user.primaryEmailAddress?.emailAddress) {
             return NextResponse.json(
@@ -15,7 +17,7 @@ export async function POST(req: NextRequest) {
             );
         }
 
-        const email = user.primaryEmailAddress.emailAddress;
+        const email = user?.primaryEmailAddress?.emailAddress;
 
         // Check if user already exists
         const existingUsers = await db
