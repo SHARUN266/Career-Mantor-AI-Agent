@@ -1,6 +1,10 @@
+"use client"
 import { Button } from '@/components/ui/button';
+import { useUser } from '@clerk/nextjs';
+import axios from 'axios';
 import Image from 'next/image';
-import Link from 'next/link';
+import { useRouter } from 'next/navigation';
+
 import React from 'react'
 import { v4 as uuidv4 } from 'uuid';
 interface TOOL {
@@ -14,15 +18,27 @@ type AiToolCardProps = {
     tool: TOOL;
 }
 function AiToolCard({tool}: AiToolCardProps) {
-  const id=uuidv4()
+  const id=uuidv4();
+  const {user}=useUser();
+  const router=useRouter();
+  const onClickButton=async()=>{
+      // Create new record for history table
+      const result=await axios.post('/api/history',{
+           recordId:id,
+           content:[],
+
+      })
+      console.log(result)
+      router.push(tool.path + "/" + id)
+  }
   return (
     <div className='p-3 border rounded-lg '>
         <Image src={tool.icon} alt={tool.name}  width={40} height={40} className='w-12 h-12 rounded-md' />
         <h2 className='font-bold mt-2'>{tool.name}</h2>
         <p className='text-gray-400'>{tool.desc}</p>
-        <Link href={tool?.path+"/"+id}>
-        <Button className='w-full mt-3'>{tool.button}</Button>
-        </Link>
+        
+        <Button onClick={onClickButton} className='w-full mt-3'>{tool.button}</Button>
+        
     </div>
   )
 }

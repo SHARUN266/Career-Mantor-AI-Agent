@@ -35,7 +35,18 @@ function AiChat() {
     setUserInput("");
     setLoading(false);
   };
-  useEffect(() => {}, [messagesList]);
+  useEffect(() => {
+    messagesList?.length>0&& updateMessagesList()
+
+  }, [messagesList]);
+
+  const updateMessagesList=async()=>{
+      const result=await axios.put("/api/history",{
+        content:messagesList,
+        recordId:chatId
+      });
+      console.log(result)
+  }
   console.log("Get Messages:", messagesList);
   return (
     <div className="px-10 md:px-24 lg:px-36 xl:px-48 h-[75vh] overflow-auto ">
