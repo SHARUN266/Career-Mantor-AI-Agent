@@ -37,3 +37,22 @@ export async function PUT(req: any) {
     return NextResponse.json(e);
   }
 }
+
+
+
+export async function GET(req:any){
+    const {searchParams}=new URL(req.url);
+    const recordId=searchParams.get('recordId');
+    try{
+        if(recordId){
+
+            const result=await db.select().from(userHistoryTable).where(eq(userHistoryTable.recordId,recordId));
+            return NextResponse.json(result[0])
+        }
+         return NextResponse.json({})
+
+    }catch (e) {
+    return NextResponse.json(e);
+  }
+
+}

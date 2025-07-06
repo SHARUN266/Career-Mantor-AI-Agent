@@ -6,7 +6,8 @@ import React, { useEffect, useState } from "react";
 import EmptyState from "../_components/EmptyState";
 import Markdown from "react-markdown";
 import axios from "axios";
-import { useParams } from "next/navigation";
+import { useParams, useRouter } from "next/navigation";
+import { v4 as uuidv4 } from 'uuid';
 type messages = {
   content: string;
   role: string;
@@ -16,7 +17,17 @@ function AiChat() {
   const [userInput, setUserInput] = useState<string>("");
   const [loading, setLoading] = useState(false);
   const [messagesList, setMessagesList] = useState<messages[]>([]);
-  const {chatId} =useParams()
+  const {chatId} =useParams();
+  const router=useRouter()
+  useEffect(()=>{
+     GetMessageList()
+  },[chatId])
+  const GetMessageList=async()=>{
+    const result=await axios.get('/api/history?recordId='+chatId);
+    console.log(result.data);
+    setMessagesList(result?.data?.content)
+
+  }
   const onSend = async () => {
     setLoading(true);
     setMessagesList((prev) => [
@@ -47,6 +58,18 @@ function AiChat() {
       });
       console.log(result)
   }
+
+  const onNewChat=async()=>{
+      // Create new record for history table
+      const id=uuidv4()
+      const result=await axios.post('/api/history',{
+           recordId:id,
+           content:[],
+
+      })
+      console.log(result)
+      router.replace("/ai-tools/ai-chat/" + id)
+  }
   console.log("Get Messages:", messagesList);
   return (
     <div className="px-10 md:px-24 lg:px-36 xl:px-48 h-[75vh] overflow-auto ">
@@ -57,7 +80,7 @@ function AiChat() {
             Smarter career decisions start here-get tailored advice.
           </p>
         </div>
-        <Button>+ New Chat</Button>
+        <Button onClick={onNewChat}>+ New Chat</Button>
       </div>
       <div className="flex flex-col h-[75vh]">
         {messagesList?.length <= 0 && (
