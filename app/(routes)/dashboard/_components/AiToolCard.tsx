@@ -5,8 +5,9 @@ import axios from 'axios';
 import Image from 'next/image';
 import { useRouter } from 'next/navigation';
 
-import React from 'react'
+import React, { useState } from 'react'
 import { v4 as uuidv4 } from 'uuid';
+import ResumeUploadDialogue from './ResumeUploadDialogue';
 interface TOOL {
     name: string;
     desc: string;
@@ -21,8 +22,14 @@ function AiToolCard({tool}: AiToolCardProps) {
   const id=uuidv4();
   const {user}=useUser();
   const router=useRouter();
+  const [openResumeUpload, setOpenResumeUpload] = useState(false);
+ 
   const onClickButton=async()=>{
       // Create new record for history table
+       if(tool.name==="AI Resume Analyzer"){
+    setOpenResumeUpload(true);
+      return;
+  }
       const result=await axios.post('/api/history',{
            recordId:id,
            content:[],
@@ -38,7 +45,7 @@ function AiToolCard({tool}: AiToolCardProps) {
         <p className='text-gray-400'>{tool.desc}</p>
         
         <Button onClick={onClickButton} className='w-full mt-3'>{tool.button}</Button>
-        
+        <ResumeUploadDialogue  openResumeUpload={openResumeUpload}  setOpenResumeUpload={setOpenResumeUpload}  />
     </div>
   )
 }
